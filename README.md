@@ -8,7 +8,7 @@ A web-based cognitive assessment platform featuring interactive games and real-t
 
 ## 🚀 Quick Start
 
-See [QUICK_START.md](./QUICK_START.md) for installation and setup instructions.
+See [QUICK_START.md](./docs/QUICK_START.md) for installation and setup instructions.
 
 **TL;DR**: Run `npm install` then `npm run dev` and open `http://localhost:5173`
 
@@ -113,10 +113,10 @@ View comprehensive results, scores, and cognitive assessment reports.
 
 ## 📚 Documentation
 
-- [Quick Start Guide](./QUICK_START.md) - Installation and setup
-- [Architecture](./ARCHITECTURE.md) - Technical architecture
-- [Privacy Policy](./README_PRIVACY.md) - Data handling and privacy
-- [Games Integration](./GAMES_INTEGRATION.md) - Game development guide
+- [Quick Start Guide](./docs/QUICK_START.md) - Installation and setup
+- [Architecture](./docs/ARCHITECTURE.md) - Technical architecture
+- [Privacy Policy](./docs/README_PRIVACY.md) - Data handling and privacy
+- [Games Integration](./docs/GAMES_INTEGRATION.md) - Game development guide
 
 ---
 

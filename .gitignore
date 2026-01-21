@@ -6,3 +6,4 @@ __pycache__/
 .DS_Store
 emotion_model.h5
 tfjs_model/
+venv/

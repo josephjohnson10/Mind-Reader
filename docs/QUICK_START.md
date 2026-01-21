@@ -11,7 +11,15 @@ nvm install 20
 nvm use 20
 ```
 
-### 2. Run Application
+### 2. Configure Environment (First Time Only)
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+2. **Add your API Key:**
+   Open `.env` and paste your OpenAI key after `VITE_OPENAI_API_KEY=`.
+
+### 3. Run Application
 ```bash
 cd "/home/nibin/Desktop/Projects/ihrd hackathon/image-rec"
 npm install
