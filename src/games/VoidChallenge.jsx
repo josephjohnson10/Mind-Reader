@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 const VoidChallenge = () => {
-    const { updateGameResult, userProfile, recordGameAttempt } = useGame();
+    const { updateGameResult, recordGameAttempt } = useGame();
     const navigate = useNavigate();
     const canvasRef = useRef(null);
     
@@ -21,34 +20,72 @@ const VoidChallenge = () => {
         metrics: { correct: 0, incorrect: 0, timeTaken: [] }
     });
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        let animationId;
+    const rectCircleCollision = (rect, circle) => {
+        const distX = Math.abs(circle.x - rect.x - rect.width / 2);
+        const distY = Math.abs(circle.y - rect.y - rect.height / 2);
+        if (distX > (rect.width / 2 + circle.radius)) return false;
+        if (distY > (rect.height / 2 + circle.radius)) return false;
+        return true;
+    };
+
+    const endGame = () => {
+        setGameState('ended');
+        const data = gameDataRef.current;
+        const analysis = {
+            score: score,
+            grade: holesEntered >= 3 ? 'A' : lives <= 0 ? 'C' : 'B',
+            correct: data.metrics.correct,
+            incorrect: data.metrics.incorrect,
+            riskLevel: lives <= 0 ? 'Medium' : 'Low'
+        };
         
-        const handleKeyDown = (e) => {
-            if (e.code === 'Space' && gameState === 'playing') {
-                gameDataRef.current.player.velocityY = gameDataRef.current.player.lift;
+        updateGameResult('voidChallenge', analysis);
+        setTimeout(() => navigate('/play/warp-explorer'), 2000);
+    };
+
+    const handleHit = () => {
+        if (gameDataRef.current.invincibilityFrames > 0) return;
+        
+        setLives(prev => {
+            const newLives = prev - 1;
+            if (newLives <= 0) {
+                endGame();
+            } else {
+                gameDataRef.current.invincibilityFrames = 60;
             }
-        };
+            return newLives;
+        });
+    };
+
+    const askQuestion = (holeIndex) => {
+        const a = Math.floor(Math.random() * 10) + 1;
+        const b = Math.floor(Math.random() * 10) + 1;
+        const startTime = Date.now();
         
-        window.addEventListener('keydown', handleKeyDown);
-
-        const gameLoop = () => {
-            if (gameState !== 'playing') return;
+        setTimeout(() => {
+            const answer = prompt(`VOID CHALLENGE: What is ${a} + ${b}?`);
+            const timeSpent = (Date.now() - startTime) / 1000;
+            const isCorrect = parseInt(answer) === (a + b);
             
-            update();
-            draw(ctx);
-            animationId = requestAnimationFrame(gameLoop);
-        };
-
-        gameLoop();
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            cancelAnimationFrame(animationId);
-        };
-    }, [gameState, lives, holesEntered]);
+            recordGameAttempt('void-challenge', 'number', 1, isCorrect, timeSpent);
+            
+            if (isCorrect) {
+                setHolesEntered(prev => prev + 1);
+                setScore(prev => prev + 100);
+                gameDataRef.current.metrics.correct++;
+                
+                if (holesEntered + 1 >= 3) {
+                    endGame();
+                }
+            } else {
+                handleHit();
+                gameDataRef.current.metrics.incorrect++;
+            }
+            
+            gameDataRef.current.blackHoles.splice(holeIndex, 1);
+            setGameState('playing');
+        }, 50);
+    };
 
     const update = () => {
         const data = gameDataRef.current;
@@ -133,72 +170,35 @@ const VoidChallenge = () => {
         });
     };
 
-    const rectCircleCollision = (rect, circle) => {
-        const distX = Math.abs(circle.x - rect.x - rect.width / 2);
-        const distY = Math.abs(circle.y - rect.y - rect.height / 2);
-        if (distX > (rect.width / 2 + circle.radius)) return false;
-        if (distY > (rect.height / 2 + circle.radius)) return false;
-        return true;
-    };
-
-    const handleHit = () => {
-        if (gameDataRef.current.invincibilityFrames > 0) return;
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationId;
         
-        setLives(prev => {
-            const newLives = prev - 1;
-            if (newLives <= 0) {
-                endGame();
-            } else {
-                gameDataRef.current.invincibilityFrames = 60;
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space' && gameState === 'playing') {
+                gameDataRef.current.player.velocityY = gameDataRef.current.player.lift;
             }
-            return newLives;
-        });
-    };
-
-    const askQuestion = (holeIndex) => {
-        const a = Math.floor(Math.random() * 10) + 1;
-        const b = Math.floor(Math.random() * 10) + 1;
-        const startTime = Date.now();
-        
-        setTimeout(() => {
-            const answer = prompt(`VOID CHALLENGE: What is ${a} + ${b}?`);
-            const timeSpent = (Date.now() - startTime) / 1000;
-            const isCorrect = parseInt(answer) === (a + b);
-            
-            recordGameAttempt('void-challenge', 'number', 1, isCorrect, timeSpent);
-            
-            if (isCorrect) {
-                setHolesEntered(prev => prev + 1);
-                setScore(prev => prev + 100);
-                gameDataRef.current.metrics.correct++;
-                
-                if (holesEntered + 1 >= 3) {
-                    endGame();
-                }
-            } else {
-                handleHit();
-                gameDataRef.current.metrics.incorrect++;
-            }
-            
-            gameDataRef.current.blackHoles.splice(holeIndex, 1);
-            setGameState('playing');
-        }, 50);
-    };
-
-    const endGame = () => {
-        setGameState('ended');
-        const data = gameDataRef.current;
-        const analysis = {
-            score: score,
-            grade: holesEntered >= 3 ? 'A' : lives <= 0 ? 'C' : 'B',
-            correct: data.metrics.correct,
-            incorrect: data.metrics.incorrect,
-            riskLevel: lives <= 0 ? 'Medium' : 'Low'
         };
         
-        updateGameResult('voidChallenge', analysis);
-        setTimeout(() => navigate('/play/warp-explorer'), 2000);
-    };
+        window.addEventListener('keydown', handleKeyDown);
+
+        const gameLoop = () => {
+            if (gameState !== 'playing') return;
+            
+            update();
+            draw(ctx);
+            animationId = requestAnimationFrame(gameLoop);
+        };
+
+        gameLoop();
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            cancelAnimationFrame(animationId);
+        };
+    }, [gameState, lives, holesEntered]);
 
     return (
         <div className="relative w-full h-full bg-gray-900 rounded-xl border border-white/10 flex flex-col items-center justify-center">

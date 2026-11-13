@@ -5,26 +5,48 @@ const GameContext = createContext();
 
 export const useGame = () => useContext(GameContext);
 
+const defaultGameStats = {
+    lexicalLegends: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    focusFlight: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    numberNinja: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    voidChallenge: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    memoryQuest: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    warpExplorer: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    bridgeGame: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    treasureHunter: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    defenderChallenge: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    matrixReasoning: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    spatialRecall: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
+    questionnaire: { completed: false, analysis: null }
+};
+
+const defaultLearningRisk = {
+    dyslexia: 0,
+    dyscalculia: 80,
+    dysgraphia: 0,
+    adhd: 0,
+    dyspraxia: 0,
+    auditoryProcessing: 0,
+    overall: 'Low'
+};
+
 export const GameProvider = ({ children }) => {
-    const [userProfile, setUserProfile] = useState({
-        name: '',
-        age: 10, // Default age
-        avatar: 'default'
+    const [userProfile, setUserProfile] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem('mindreader-user-profile');
+            return saved ? JSON.parse(saved) : { name: '', age: 10, avatar: 'default' };
+        } catch {
+            return { name: '', age: 10, avatar: 'default' };
+        }
     });
 
-    const [gameStats, setGameStats] = useState({
-        lexicalLegends: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        focusFlight: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        numberNinja: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        voidChallenge: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        memoryQuest: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        warpExplorer: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        bridgeGame: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        treasureHunter: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        defenderChallenge: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        matrixReasoning: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        spatialRecall: { played: false, score: 0, grade: null, history: [], riskScore: 0 },
-        questionnaire: { completed: false, analysis: null }
+    const [gameStats, setGameStats] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem('mindreader-game-stats');
+            return saved ? JSON.parse(saved) : defaultGameStats;
+        } catch {
+            return defaultGameStats;
+        }
     });
 
     const [emotionData, setEmotionData] = useState({
@@ -33,15 +55,38 @@ export const GameProvider = ({ children }) => {
         isActive: false
     });
 
-    const [learningDisabilityRisk, setLearningDisabilityRisk] = useState({
-        dyslexia: 0,
-        dyscalculia: 80,
-        dysgraphia: 0,
-        adhd: 0,
-        dyspraxia: 0,
-        auditoryProcessing: 0,
-        overall: 'Low'
+    const [learningDisabilityRisk, setLearningDisabilityRisk] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem('mindreader-learning-risk');
+            return saved ? JSON.parse(saved) : defaultLearningRisk;
+        } catch {
+            return defaultLearningRisk;
+        }
     });
+
+    useEffect(() => {
+        try {
+            sessionStorage.setItem('mindreader-user-profile', JSON.stringify(userProfile));
+        } catch (e) {
+            void e;
+        }
+    }, [userProfile]);
+
+    useEffect(() => {
+        try {
+            sessionStorage.setItem('mindreader-game-stats', JSON.stringify(gameStats));
+        } catch (e) {
+            void e;
+        }
+    }, [gameStats]);
+
+    useEffect(() => {
+        try {
+            sessionStorage.setItem('mindreader-learning-risk', JSON.stringify(learningDisabilityRisk));
+        } catch (e) {
+            void e;
+        }
+    }, [learningDisabilityRisk]);
     
     // Track math performance for dyscalculia reduction
     const [mathQuestionsCorrect, setMathQuestionsCorrect] = useState({ easy: 0, tough: 0 });

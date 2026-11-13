@@ -2,7 +2,19 @@
 
 A web-based cognitive assessment platform featuring interactive games and real-time emotion detection to evaluate mental health and cognitive abilities.
 
-![Home Page](./screenshots/homepage.png)
+Built for the **IHRD Hackathon** with React, Vite, Tailwind CSS, Recharts, and OpenAI API.
+
+---
+
+## 📸 Visual Showcase
+
+| Landing Page (Student / Parent / Teacher) | Mission Control Dashboard |
+| :---: | :---: |
+| ![Home Page](docs/screenshots/01-mindreader-homepage.png) | ![Mission Control](docs/screenshots/03-mission-control-dashboard.png) |
+
+| 4-Core Assessment Protocol | Comprehensive Cognitive Report & Charts |
+| :---: | :---: |
+| ![4 Core Games](docs/screenshots/05-game-selection-core-4.png) | ![Assessment Report](docs/screenshots/09-results-cognitive-report-charts.png) |
 
 ---
 
@@ -10,7 +22,19 @@ A web-based cognitive assessment platform featuring interactive games and real-t
 
 See [QUICK_START.md](./docs/QUICK_START.md) for installation and setup instructions.
 
-**TL;DR**: Run `npm install` then `npm run dev` and open `http://localhost:5173`
+```bash
+# Install dependencies
+npm install
+
+# Run unit test suite (16 tests)
+npm test
+
+# Run linter
+npm run lint
+
+# Start local development server
+npm run dev
+```
 
 ---
 
