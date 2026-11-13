@@ -7,3 +7,5 @@ __pycache__/
 emotion_model.h5
 tfjs_model/
 venv/
+dist/
+dist-ssr/
